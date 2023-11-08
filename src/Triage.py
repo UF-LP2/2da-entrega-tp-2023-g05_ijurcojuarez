@@ -56,7 +56,7 @@ def cambiar_gravedad(pacientes):
 
 
 def atender_paciente(dni):
-    pos = pacientes.index(pacientes["dni"])  # index busca la posicion en la lista
+    pos = pacientes.index(dni)  # index busca la posicion en la lista
     del pacientes[pos]   # borra al paciente, se va del hospital
 
 
@@ -68,10 +68,10 @@ def dyc(pacientes):
         if pacientes[0]["gravedad"] > pacientes[1]["gravedad"]:
           return pacientes
         else:
-          pacientes_aux = pacientes[0]
-          pacientes[0] = pacientes[1]
-          pacientes[1] = pacientes_aux
-          return pacientes
+            pacientes_aux = pacientes[0]
+            pacientes[0] = pacientes[1]
+            pacientes[1] = pacientes_aux
+            return pacientes
 
 
     else:
