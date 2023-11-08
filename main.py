@@ -1,3 +1,4 @@
+from src import Cronometro
 def main() -> None:
   print("Hello World")
 
