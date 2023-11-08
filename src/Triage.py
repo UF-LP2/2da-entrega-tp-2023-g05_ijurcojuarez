@@ -36,22 +36,22 @@ def asignar_gravedad(pacientes):
         elif pacientes[i]["síntomas"] == 'cefalea' or pacientes[i]["síntomas"]== 'tos':
             pacientes[i]["gravedad"] = 1      # azul
 
-        pacientes[i]["tiempo_espera"] = minutos_transcurridos()     # asigno el tiempo en el cual fue revisado
+        pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
 
 
 def cambiar_gravedad(pacientes):
     # chequear color y si su tiempo es mayor al tiempo de espera del siguiente cambiar color
     for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 1 and pacientes[i]["tiempo_espera"] >= 120:  # llego al tiempo del verde -> lo cambio
+        if pacientes[i]["gravedad"] == 1 and (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 120:  # llego al tiempo del verde -> lo cambio
             pacientes[i]["gravedad"] = 2
 
-        if pacientes[i]["gravedad"] == 2 and pacientes[i]["tiempo_espera"] >= 60:  # llego al tiempo del amarillo -> lo cambio
+        if pacientes[i]["gravedad"] == 2 and (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 60:  # llego al tiempo del amarillo -> lo cambio
             pacientes[i]["gravedad"] = 3
 
-        if pacientes[i]["gravedad"] == 3 and pacientes[i]["tiempo_espera"] >= 50:  # llego al tiempo del naranja -> lo cambio
+        if pacientes[i]["gravedad"] == 3 and (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 50:  # llego al tiempo del naranja -> lo cambio
             pacientes[i]["gravedad"] = 4
 
-        if pacientes[i]["gravedad"] == 4 and pacientes[i]["tiempo_espera"] >= 9:  # llego al tiempo del rojo -> lo cambio
+        if pacientes[i]["gravedad"] == 4 and (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 9:  # llego al tiempo del rojo -> lo cambio
             pacientes[i]["gravedad"] = 5
 
 
