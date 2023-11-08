@@ -1,4 +1,4 @@
-from src import Cronometro
+from src import Interfaz
 def main() -> None:
   print("Hello World")
 

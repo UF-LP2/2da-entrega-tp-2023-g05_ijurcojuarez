@@ -1,4 +1,4 @@
-from Cronometro import minutos_transcurridos
+from Interfaz import minutos_transcurridos
 
 enfermeros: int
 pacientes = []
@@ -21,22 +21,22 @@ def asignar_enfermeros():
 
 def asignar_gravedad(pacientes):
     for i in range(len(pacientes)):
-        if pacientes[i]["síntomas"] == 'politraumatismo grave':
-            pacientes["gravedad"] = 5    # rojo
+        if pacientes[i]["sintomas"] == 'politraumatismo grave':
+            pacientes[i]["gravedad"] = 5  # rojo
 
-        elif pacientes[i]["síntomas"] == 'coma' or pacientes[i]["síntomas"] == 'convulsiones' or pacientes[i]["síntomas"] == 'hemorragia digestiva' or pacientes[i]["síntomas"] == 'isquemia':
-            pacientes[i]["gravedad"] = 4     # naranja
+        elif pacientes[i]["sintomas"] == 'coma' or pacientes[i]["sintomas"] == 'convulsiones' or pacientes[i]["sintomas"] == 'hemorragia digestiva' or pacientes[i]["sintomas"] == 'isquemia':
+            pacientes[i]["gravedad"] = 4  # naranja
 
-        elif pacientes[i]["síntomas"] == 'cefalea brusca' or pacientes[i]["síntomas"] == 'paresia' or pacientes[i]["síntomas"] == 'hipertension arterial' or pacientes[i]["síntomas"] == 'vertigo con afectacion vegetativa' or pacientes[i]["síntomas"] == 'sincope' or pacientes[i]["síntomas"] == 'urgencias psiquiatricas':
-            pacientes[i]["gravedad"] = 3     # amarilla
+        elif pacientes[i]["sintomas"] == 'cefalea brusca' or pacientes[i]["sintomas"] == 'paresia' or pacientes[i]["sintomas"] == 'hipertension arterial' or pacientes[i]["sintomas"] == 'vertigo con afectacion vegetativa' or pacientes[i]["sintomas"] == 'sincope' or pacientes[i]["sintomas"] == 'urgencias psiquiatricas':
+            pacientes[i]["gravedad"] = 3  # amarilla
 
-        elif pacientes[i]["síntomas"] == 'otalgias' or pacientes[i]["síntomas"] == 'odontalgias' or pacientes[i]["síntomas"] == 'dolores inespecificos leves' or pacientes[i]["síntomas"] == 'traumatismos' or pacientes[i]["síntomas"] == 'esguinces' :
-            pacientes[i]["gravedad"] = 2      # verde
+        elif pacientes[i]["sintomas"] == 'otalgias' or pacientes[i]["sintomas"] == 'odontalgias' or pacientes[i]["sintomas"] == 'dolores inespecificos leves' or pacientes[i]["sintomas"] == 'traumatismos' or pacientes[i]["sintomas"] == 'esguinces':
+            pacientes[i]["gravedad"] = 2  # verde
 
-        elif pacientes[i]["síntomas"] == 'cefalea' or pacientes[i]["síntomas"]== 'tos':
-            pacientes[i]["gravedad"] = 1      # azul
+        elif pacientes[i]["sintomas"] == 'cefalea' or pacientes[i]["sintomas"] == 'tos':
+            pacientes[i]["gravedad"] = 1  # azul
 
-        pacientes[i]["tiempo_espera"] = minutos_transcurridos()     # asigno el tiempo en el cual fue revisado
+        pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
 
 
 def cambiar_gravedad(pacientes):
