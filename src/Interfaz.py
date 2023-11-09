@@ -1,65 +1,28 @@
+from src.Triage import atender_paciente, dyc
 from datetime import datetime, timedelta
 import tkinter as tk
 import csv
+import time
+
+with open("DATOS.csv", "r") as tabla:
+    csv_reader = csv.DictReader(tabla)  # lee por columnas
+    # Passing the cav_reader object to list() to get a list of lists
+    lista_pacientes = list(csv_reader)
 
 
 INTERVALO_REFRESCO = 1
 hora_inicio = datetime.now()
 minutos_programa = 0
+activo=False
 
-
-with open("DATOS.csv", "r") as tabla:
-    csv_reader = csv.DictReader(tabla)  # lee por columnas
-    # Passing the cav_reader object to list() to get a list of lists
-    pacientes = list(csv_reader)
-
-#todo: arrglar esto
-"""def buscar_pacientes_por_gravedad(gravedad, pacientes):
-    gravedad = 0
-    if color == "Azules":
-        gravedad = 1
-    elif color == "Verdes":
-        gravedad = 2
-    elif color == "Amarillos":
-        gravedad = 3
-    elif color == "Naranjas":
-        gravedad = 4
-    elif color == "Rojos":
-        gravedad = 5
-    
-    pacientes_seleccionados = [paciente[1] for paciente in pacientes if paciente[5] == gravedad]
-
-    # Actualiza o muestra la lista de pacientes en la ventana de tkinter
-    lista_pacientes.delete(0, tk.END)
-    for paciente in pacientes_seleccionados:
-        lista_pacientes.insert(tk.END, paciente)
-        
-# Función para manejar la selección del menú desplegable
-def color_seleccionado(event):
-    color = color_var.get()
-    if color:
-        buscar_pacientes_por_color(color)
-
-(... esto abajo del todo)
-raiz.title("Lista de Pacientes")
-
-color_var = tk.StringVar()
-
-# Crea un menú desplegable con los colores
-colores = ["elija una gravedad:", "Azules", "Verdes", "Amarillos", "Naranjas", "Rojos"]
-menu_color = ttk.Combobox(raiz, textvariable=color_var, values=colores)
-menu_color.bind("<<ComboboxSelected>>", color_seleccionado)
-menu_color.pack()
-
-# Crea una lista para mostrar los nombres de los pacientes
-lista_pacientes = tk.Listbox(raiz)
-lista_pacientes.pack()
-"""
 def iniciar_reloj():
     global hora_inicio, en_ejecucion
     hora_inicio = datetime.now()
     en_ejecucion = True
     refrescar_tiempo_transcurrido()
+    asignar_gravedad(lista_pacientes)
+    print(lista_pacientes)
+    dyc(lista_pacientes)
 
 
 def detener_reloj():
@@ -99,11 +62,18 @@ def reiniciar_cronometro():
 
 
 def refrescar_tiempo_transcurrido():
+    global activo
     if en_ejecucion:
         variable_hora_actual.set(obtener_tiempo_transcurrido_formateado())
         minutos_pasados_label.config(text=f"Minutos transcurridos: {minutos_transcurridos()}")
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
+        if minutos_transcurridos()>=10 and minutos_transcurridos() % 10 == 0 and activo==False:
+            activo=True
+            Hospital(lista_pacientes)
+        if(minutos_transcurridos()% 5 == 0 and minutos_transcurridos()%2 != 0):
+            activo= False
+
 
 def mostrar_lista_color(seleccion):
     nueva_ventana = tk.Toplevel(raiz)
@@ -126,11 +96,69 @@ def mostrar_lista_color(seleccion):
     for elemento in elementos:
         lista_color.insert(tk.END, elemento)
 
+def asignar_enfermeros():
+    if minutos_transcurridos() == 1380:  # minutos de 23 horas
+        enfermeros = 1
+
+    if minutos_transcurridos() == 360:  # minutos de 6 horas
+        enfermeros = 2
+
+    if minutos_transcurridos() == 600:  # minutos de 10 horas
+        enfermeros = 5
+
+    if minutos_transcurridos() == 960:  # minutos de 16 horas
+        enfermeros = 3
+
+    return enfermeros
+
+def asignar_gravedad(pacientes):
+    for i in range(len(pacientes)):
+        if pacientes[i]["sintomas"] == 'politraumatismo grave':
+            pacientes[i]["gravedad"] = 5  # rojo
+
+        elif pacientes[i]["sintomas"] == 'coma' or pacientes[i]["sintomas"] == 'convulsiones' or pacientes[i]["sintomas"] == 'hemorragia digestiva' or pacientes[i]["sintomas"] == 'isquemia':
+            pacientes[i]["gravedad"] = 4  # naranja
+
+        elif pacientes[i]["sintomas"] == 'cefalea brusca' or pacientes[i]["sintomas"] == 'paresia' or pacientes[i]["sintomas"] == 'hipertension arterial' or pacientes[i]["sintomas"] == 'vertigo con afectacion vegetativa' or pacientes[i]["sintomas"] == 'sincope' or pacientes[i]["sintomas"] == 'urgencias psiquiatricas':
+            pacientes[i]["gravedad"] = 3  # amarilla
+
+        elif pacientes[i]["sintomas"] == 'otalgias' or pacientes[i]["sintomas"] == 'odontalgias' or pacientes[i]["sintomas"] == 'dolores inespecificos leves' or pacientes[i]["sintomas"] == 'traumatismos' or pacientes[i]["sintomas"] == 'esguinces':
+            pacientes[i]["gravedad"] = 2  # verde
+
+        elif pacientes[i]["sintomas"] == 'cefalea' or pacientes[i]["sintomas"] == 'tos':
+            pacientes[i]["gravedad"] = 1  # azul
+
+        pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
+
+
+def cambiar_gravedad(pacientes):
+    # chequear color y si su tiempo es mayor al tiempo de espera del siguiente cambiar color
+    for i in range(len(pacientes)):
+        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 120 and pacientes[i]["gravedad"] == 1 :  # llego al tiempo del verde -> lo cambio
+            pacientes[i]["gravedad"] = 2
+
+        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 60 and pacientes[i]["gravedad"] == 2:  # llego al tiempo del amarillo -> lo cambio
+            pacientes[i]["gravedad"] = 3
+
+        if  (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 50 and pacientes[i]["gravedad"] == 3:  # llego al tiempo del naranja -> lo cambio
+            pacientes[i]["gravedad"] = 4
+
+        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 9 and pacientes[i]["gravedad"] == 4 :  # llego al tiempo del rojo -> lo cambio
+            pacientes[i]["gravedad"] = 5
+
+    return pacientes
+def Hospital(lista_pacientes):
+    lista_pacientes = cambiar_gravedad(lista_pacientes)
+    lista_ordenada=dyc(lista_pacientes)
+
+
+
+
 raiz = tk.Tk()
 variable_hora_actual = tk.StringVar(raiz, value="00:00:00")
 raiz.etiqueta = tk.Label(raiz, textvariable=variable_hora_actual, font="Consolas 60")
 raiz.etiqueta.pack()
-
+#
 boton_iniciar = tk.Button(raiz, text="Iniciar Tiempo", command=iniciar_reloj, bg="green", fg="white")
 boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 
@@ -157,6 +185,7 @@ boton_mostrar_lista.pack()
 app = tk.Frame()
 raiz.title("reloj")
 
-
 app.pack()
 raiz.mainloop()
+
+
