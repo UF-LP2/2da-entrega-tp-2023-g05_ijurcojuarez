@@ -12,6 +12,49 @@ with open("DATOS.csv", "r") as tabla:
     csv_reader = csv.DictReader(tabla)  # lee por columnas
     # Passing the cav_reader object to list() to get a list of lists
     pacientes = list(csv_reader)
+
+#todo: arrglar esto
+"""def buscar_pacientes_por_gravedad(gravedad, pacientes):
+    gravedad = 0
+    if color == "Azules":
+        gravedad = 1
+    elif color == "Verdes":
+        gravedad = 2
+    elif color == "Amarillos":
+        gravedad = 3
+    elif color == "Naranjas":
+        gravedad = 4
+    elif color == "Rojos":
+        gravedad = 5
+    
+    pacientes_seleccionados = [paciente[1] for paciente in pacientes if paciente[5] == gravedad]
+
+    # Actualiza o muestra la lista de pacientes en la ventana de tkinter
+    lista_pacientes.delete(0, tk.END)
+    for paciente in pacientes_seleccionados:
+        lista_pacientes.insert(tk.END, paciente)
+        
+# Función para manejar la selección del menú desplegable
+def color_seleccionado(event):
+    color = color_var.get()
+    if color:
+        buscar_pacientes_por_color(color)
+
+(... esto abajo del todo)
+raiz.title("Lista de Pacientes")
+
+color_var = tk.StringVar()
+
+# Crea un menú desplegable con los colores
+colores = ["elija una gravedad:", "Azules", "Verdes", "Amarillos", "Naranjas", "Rojos"]
+menu_color = ttk.Combobox(raiz, textvariable=color_var, values=colores)
+menu_color.bind("<<ComboboxSelected>>", color_seleccionado)
+menu_color.pack()
+
+# Crea una lista para mostrar los nombres de los pacientes
+lista_pacientes = tk.Listbox(raiz)
+lista_pacientes.pack()
+"""
 def iniciar_reloj():
     global hora_inicio, en_ejecucion
     hora_inicio = datetime.now()
@@ -106,7 +149,7 @@ seleccion.set(opciones[0])  # Valor predeterminado
 menu_color = tk.OptionMenu(raiz, seleccion, *opciones)
 menu_color.pack()
 
-boton_mostrar_lista = tk.Button(raiz, text="Mostrar Lista", command=lambda: mostrar_lista_color(seleccion.get()))
+boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca", command=lambda: mostrar_lista_color(seleccion.get()))
 boton_mostrar_lista.pack()
 
 
