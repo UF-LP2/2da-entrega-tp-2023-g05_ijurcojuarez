@@ -1,8 +1,7 @@
-from src.Triage import atender_paciente, dyc
-from datetime import datetime, timedelta
+from src.Triage import dyc
+from datetime import datetime
 import tkinter as tk
 import csv
-import time
 
 with open("DATOS.csv", "r") as tabla:
     csv_reader = csv.DictReader(tabla)  # lee por columnas
@@ -10,17 +9,19 @@ with open("DATOS.csv", "r") as tabla:
     lista_pacientes = list(csv_reader)
 
 
-INTERVALO_REFRESCO = 1
+INTERVALO_REFRESCO = 1000
+en_ejecucion = False
 hora_inicio = datetime.now()
 minutos_programa = 0
-activo=False
+activo = False
+
 
 def iniciar_reloj():
     global hora_inicio, en_ejecucion
     hora_inicio = datetime.now()
     en_ejecucion = True
     refrescar_tiempo_transcurrido()
-    asignar_gravedad(lista_pacientes)
+    #asignar_gravedad(lista_pacientes)
     print(lista_pacientes)
     dyc(lista_pacientes)
 
@@ -60,6 +61,23 @@ def reiniciar_cronometro():
         en_ejecucion = True
 
 
+def asignar_enfermeros():
+    enfermeros = 2
+    if minutos_transcurridos() == 1380:  # minutos de 23 horas
+        enfermeros = 1
+
+    if minutos_transcurridos() == 360:  # minutos de 6 horas
+        enfermeros = 2
+
+    if minutos_transcurridos() == 600:  # minutos de 10 horas
+        enfermeros = 5
+
+    if minutos_transcurridos() == 960:  # minutos de 16 horas
+        enfermeros = 3
+
+    for i in range(enfermeros):
+        asignar_gravedad(lista_pacientes[i])
+
 
 def refrescar_tiempo_transcurrido():
     global activo
@@ -68,51 +86,54 @@ def refrescar_tiempo_transcurrido():
         minutos_pasados_label.config(text=f"Minutos transcurridos: {minutos_transcurridos()}")
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
-        if minutos_transcurridos()>=10 and minutos_transcurridos() % 10 == 0 and activo==False:
-            activo=True
+        asignar_enfermeros()
+        if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
+            activo = True
             Hospital(lista_pacientes)
-        if(minutos_transcurridos()% 5 == 0 and minutos_transcurridos()%2 != 0):
-            activo= False
+        if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() % 2 != 0:
+            activo = False
 
 
 def rojos(pacientes):
-    lista_aux=[]
+    lista_aux = []
     for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 5):
+        if pacientes[i]["gravedad"] == 5:
             lista_aux.append(pacientes[i]["nombre"])
     return lista_aux
-def rojos(pacientes):
-    lista_aux=[]
-    for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 5):
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
+
 def naranjas(pacientes):
-    lista_aux=[]
+    lista_aux = []
     for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 4):
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-def amarillos(pacientes):
-    lista_aux=[]
-    for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 3):
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-def verdes(pacientes):
-    lista_aux=[]
-    for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 2):
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-def azules(pacientes):
-    lista_aux=[]
-    for i in range(len(pacientes)):
-        if (pacientes[i]["gravedad"]== 1):
+        if pacientes[i]["gravedad"] == 4:
             lista_aux.append(pacientes[i]["nombre"])
     return lista_aux
 
- #todo:modificar para que elija la seleccion anterior si no seleccione una
+
+def amarillos(pacientes):
+    lista_aux = []
+    for i in range(len(pacientes)):
+        if pacientes[i]["gravedad"] == 3:
+            lista_aux.append(pacientes[i]["nombre"])
+    return lista_aux
+
+
+def verdes(pacientes):
+    lista_aux = []
+    for i in range(len(pacientes)):
+        if pacientes[i]["gravedad"] == 2:
+            lista_aux.append(pacientes[i]["nombre"])
+    return lista_aux
+
+
+def azules(pacientes):
+    lista_aux = []
+    for i in range(len(pacientes)):
+        if pacientes[i]["gravedad"] == 1:
+            lista_aux.append(pacientes[i]["nombre"])
+    return lista_aux
+
+    # todo:modificar para que elija la seleccion anterior si no seleccione una
+
 
 def mostrar_lista_gravedad(seleccion):
 
@@ -120,7 +141,7 @@ def mostrar_lista_gravedad(seleccion):
     nueva_ventana.title(f"Gravedad {seleccion}")
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
-
+    elementos=rojos(lista_pacientes)  # por si alguien apreta el boton antes de elegir
     if seleccion == "rojos":
         elementos = rojos(lista_pacientes)
         lista_gravedad.config(font=("Arial", 18), fg="red")
@@ -140,23 +161,11 @@ def mostrar_lista_gravedad(seleccion):
     for elemento in elementos:
         lista_gravedad.insert(tk.END, elemento)
 
-def asignar_enfermeros():
-    if minutos_transcurridos() == 1380:  # minutos de 23 horas
-        enfermeros = 1
-
-    if minutos_transcurridos() == 360:  # minutos de 6 horas
-        enfermeros = 2
-
-    if minutos_transcurridos() == 600:  # minutos de 10 horas
-        enfermeros = 5
-
-    if minutos_transcurridos() == 960:  # minutos de 16 horas
-        enfermeros = 3
-
-    return enfermeros
 
 def asignar_gravedad(pacientes):
+
     for i in range(len(pacientes)):
+
         if pacientes[i]["sintomas"] == 'politraumatismo grave':
             pacientes[i]["gravedad"] = 5  # rojo
 
@@ -171,33 +180,37 @@ def asignar_gravedad(pacientes):
 
         elif pacientes[i]["sintomas"] == 'cefalea' or pacientes[i]["sintomas"] == 'tos':
             pacientes[i]["gravedad"] = 1  # azul
-
+        else:
+            del pacientes[i]  # elimina el paciente si tiene basura en el sintoma
         pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
 
 
 def cambiar_gravedad(pacientes):
-    # chequear gravedad y si su tiempo es mayor al tiempo de espera del siguiente cambiar
+    tiempo_actual = minutos_transcurridos()
+
     for i in range(len(pacientes)):
-        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 120 and pacientes[i]["gravedad"] == 1 :  # llego al tiempo del verde -> lo cambio
+        tiempo_transcurrido = pacientes[i]["tiempo_espera"]
+
+        if tiempo_transcurrido >= 120 and pacientes[i]["gravedad"] == 1:
             pacientes[i]["gravedad"] = 2
-            pacientes[i]["tiempo_espera"]=minutos_transcurridos()
+            pacientes[i]["tiempo_espera"] = tiempo_actual
 
-        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 60 and pacientes[i]["gravedad"] == 2:  # llego al tiempo del amarillo -> lo cambio
+        elif tiempo_transcurrido >= 60 and pacientes[i]["gravedad"] == 2:
             pacientes[i]["gravedad"] = 3
-            pacientes[i]["tiempo_espera"] = minutos_transcurridos()
+            pacientes[i]["tiempo_espera"] = tiempo_actual
 
-        if  (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 50 and pacientes[i]["gravedad"] == 3:  # llego al tiempo del naranja -> lo cambio
+        elif tiempo_transcurrido >= 50 and pacientes[i]["gravedad"] == 3:
             pacientes[i]["gravedad"] = 4
-            pacientes[i]["tiempo_espera"] = minutos_transcurridos()
+            pacientes[i]["tiempo_espera"] = tiempo_actual
 
-        if (minutos_transcurridos()-pacientes[i]["tiempo_espera"]) >= 9 and pacientes[i]["gravedad"] == 4 :  # llego al tiempo del rojo -> lo cambio
+        elif tiempo_transcurrido >= 9 and pacientes[i]["gravedad"] == 4:
             pacientes[i]["gravedad"] = 5
-            pacientes[i]["tiempo_espera"] = minutos_transcurridos()
+            pacientes[i]["tiempo_espera"] = tiempo_actual
 
     return pacientes
 def Hospital(lista_pacientes):
     lista_pacientes = cambiar_gravedad(lista_pacientes)
-    lista_ordenada=dyc(lista_pacientes)
+    lista_ordenada = dyc(lista_pacientes)
 
 
 raiz = tk.Tk()
@@ -216,7 +229,7 @@ minutos_pasados_label.pack(side="left")
 
 raiz.title("Menú Desplegable")
 
-opciones = ["elija gravedad", "rojos", "naranjas", "amarillos","verdes","azules"]
+opciones = ["elija gravedad", "rojos", "naranjas", "amarillos", "verdes", "azules"]
 seleccion = tk.StringVar(raiz)
 seleccion.set(opciones[0])  # Valor predeterminado
 
@@ -228,11 +241,8 @@ boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga cli
 boton_mostrar_lista.pack()
 
 
-
 app = tk.Frame()
 raiz.title("reloj")
 
 app.pack()
 raiz.mainloop()
-
-
