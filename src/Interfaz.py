@@ -7,6 +7,7 @@ INTERVALO_REFRESCO = 1
 hora_inicio = datetime.now()
 minutos_programa = 0
 
+
 with open("DATOS.csv", "r") as tabla:
     csv_reader = csv.DictReader(tabla)  # lee por columnas
     # Passing the cav_reader object to list() to get a list of lists
@@ -22,12 +23,6 @@ def detener_reloj():
     global en_ejecucion
     en_ejecucion = False
 
-def rojos():
-    lista_aux= []
-    for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 5:
-            lista_aux.append(pacientes[i])
-    print(lista_aux) #todo: ver como se imprime la lista!!
 
 def minutos_transcurridos():
     segundos_transcurridos = (datetime.now() - hora_inicio).total_seconds()
@@ -67,55 +62,54 @@ def refrescar_tiempo_transcurrido():
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
 
-def mostrar_lista(opcion):
+def mostrar_lista_color(seleccion):
     nueva_ventana = tk.Toplevel(raiz)
-    nueva_ventana.title(f"Lista de {opcion}")
+    nueva_ventana.title(f"Elementos de color {seleccion}")
 
-    # Lista de elementos pre-cargados
-    elementos = []
+    lista_color = tk.Listbox(nueva_ventana)
+    lista_color.pack()
 
-    if opcion == "Nombres":
-        elementos = pacientes
-    elif opcion == "Colores":
-        elementos = ["Rojo", "Verde", "Azul", "Amarillo", "Naranja"]
-
-    lista = tk.Listbox(nueva_ventana)
-    lista.pack()
+    if seleccion == "rojos":
+        elementos = ["Manzana", "Fresa", "Cereza", "Tomate"] #todo: modificar esto por el csv
+    elif seleccion == "verdes":
+        elementos = ["Manzana", "Uva", "Pepino", "Pimiento"]
+    elif seleccion == "azules":
+        elementos = ["Cielo", "Mar", "Zafiro", "Arándano"]
+    elif seleccion == "amarillos":
+        elementos = ["Plátano", "Limón", "Maíz", "Girasol"]
+    elif seleccion == "naranjas":
+        elementos = ["Naranja", "Mandarina", "Zanahoria", "Calabaza"]
 
     for elemento in elementos:
-        lista.insert(tk.END, elemento)
-
+        lista_color.insert(tk.END, elemento)
 
 raiz = tk.Tk()
 variable_hora_actual = tk.StringVar(raiz, value="00:00:00")
 raiz.etiqueta = tk.Label(raiz, textvariable=variable_hora_actual, font="Consolas 60")
-raiz.etiqueta.pack(side="top")
+raiz.etiqueta.pack()
 
+boton_iniciar = tk.Button(raiz, text="Iniciar Tiempo", command=iniciar_reloj, bg="green", fg="white")
+boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
+
+boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
+boton_detener.pack(side="left")  # Coloca el botón a la izquierda
+
+minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
+minutos_pasados_label.pack(side="left")
 
 raiz.title("Menú Desplegable")
 
-opciones = ["Nombres", "Colores"]
+opciones = ["elija gravedad", "rojos", "verdes", "azules", "amarillos", "naranjas"]
+seleccion = tk.StringVar(raiz)
+seleccion.set(opciones[0])  # Valor predeterminado
 
-opcion_var = tk.StringVar()
-opcion_var.set(opciones[0])
+menu_color = tk.OptionMenu(raiz, seleccion, *opciones)
+menu_color.pack()
 
-menu_desplegable = tk.OptionMenu(raiz, opcion_var, *opciones)
-menu_desplegable.pack()
+boton_mostrar_lista = tk.Button(raiz, text="Mostrar Lista", command=lambda: mostrar_lista_color(seleccion.get()))
+boton_mostrar_lista.pack()
 
-boton_mostrar = tk.Button(raiz, text="Mostrar Lista", command=lambda: mostrar_lista(opcion_var.get()))
-boton_mostrar.pack()
-boton_iniciar = tk.Button(raiz, text="Iniciar", command=iniciar_reloj)
-boton_iniciar.pack()
 
-boton_detener = tk.Button(raiz, text="Detener", command=detener_reloj)
-boton_detener.pack()
-
-boton_rojo = tk.Button(raiz, text="rojos", command=rojos, bg="red")
-rojos_label = tk.Label(raiz, text="rojos: ")
-boton_rojo.pack(side="top")
-
-minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
-minutos_pasados_label.pack()
 
 app = tk.Frame()
 raiz.title("reloj")
