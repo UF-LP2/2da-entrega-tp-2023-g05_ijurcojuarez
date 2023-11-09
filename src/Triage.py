@@ -1,9 +1,14 @@
 from Interfaz import minutos_transcurridos
+import csv
 
 enfermeros: int
 pacientes = []
 medicos: int    # infinitos
 
+with open("DATOS.csv", "r") as tabla:
+    csv_reader = csv.DictReader(tabla)  # lee por columnas
+    # Passing the cav_reader object to list() to get a list of lists
+    pacientes = list(csv_reader)
 
 def asignar_enfermeros():
     if minutos_transcurridos() == 1380:  # minutos de 23 horas
