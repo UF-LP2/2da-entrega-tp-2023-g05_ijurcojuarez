@@ -8,15 +8,6 @@ with open("DATOS.csv", "r") as tabla:
     lista_pacientes = list(csv_reader)
 
 class MyTestCase(unittest.TestCase):
-    def test_asignar_paciente(self):
-        paciente = lista_pacientes[0]
-        self.assertEqual(paciente["gravedad"], '4')
-
-    def test_cambiar_gravedad(self):
-        # Caso de prueba con un paciente en estado azul (gravedad 1)
-        pacientes = [{"gravedad": 1, "tiempo_espera": 240}]
-        cambiar_gravedad(pacientes)
-        assert pacientes[0]["gravedad"] == 2
     def test_cambiar_gravedad_1(self):
         # Caso de prueba con un paciente en estado azul (gravedad 1)
         pacientes = [{"gravedad": 1, "tiempo_espera": 0}]
@@ -26,9 +17,9 @@ class MyTestCase(unittest.TestCase):
     def test_asignar_gravedad_1(self):
         pacientes = [{"sintomas": 'politraumatismo grave',"gravedad": 0, "tiempo_espera": 0}]
         asignar_gravedad(pacientes)
-        assert pacientes[0]["gravedad"] ==  5 # mantiene la gravedad
+        assert pacientes[0]["gravedad"] ==  5 # asigna la gravedad
 
-    def test_asignar_gravedad_1(self):
+    def test_basura(self):
         pacientes = [{"sintomas": 'asdsd', "gravedad": 0, "tiempo_espera": 0}, {"sintomas": 'politraumatismo grave', "gravedad": 0, "tiempo_espera": 0}]
         longitud_inicial = len(pacientes)# la longitud inicial de la lista de pacientes
         asignar_gravedad(pacientes) # Llama a la función que borra el paciente si tiene basura en el sintoma

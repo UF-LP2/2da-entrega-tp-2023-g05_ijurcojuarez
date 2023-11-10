@@ -21,7 +21,7 @@ def iniciar_reloj():
     hora_inicio = datetime.now()
     en_ejecucion = True
     refrescar_tiempo_transcurrido()
-    #asignar_gravedad(lista_pacientes)
+    asignar_gravedad(lista_pacientes)
     print(lista_pacientes)
     dyc(lista_pacientes)
 
@@ -62,7 +62,7 @@ def reiniciar_cronometro():
 
 
 def asignar_enfermeros():
-    enfermeros = 2
+    enfermeros=1
     if minutos_transcurridos() == 1380:  # minutos de 23 horas
         enfermeros = 1
 
@@ -75,9 +75,6 @@ def asignar_enfermeros():
     if minutos_transcurridos() == 960:  # minutos de 16 horas
         enfermeros = 3
 
-    for i in range(enfermeros):
-        asignar_gravedad(lista_pacientes[i])
-
 
 def refrescar_tiempo_transcurrido():
     global activo
@@ -89,9 +86,16 @@ def refrescar_tiempo_transcurrido():
         asignar_enfermeros()
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
-            Hospital(lista_pacientes)
+            hospital(lista_pacientes)
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() % 2 != 0:
             activo = False
+        if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5: # cada 5 mins atiende un paciente
+            atender_paciente()
+
+
+def atender_paciente():
+    del lista_pacientes[0]  # borra al paciente, se va del hospital
+    print(lista_pacientes)
 
 
 def rojos(pacientes):
@@ -100,6 +104,7 @@ def rojos(pacientes):
         if pacientes[i]["gravedad"] == 5:
             lista_aux.append(pacientes[i]["nombre"])
     return lista_aux
+
 
 def naranjas(pacientes):
     lista_aux = []
@@ -141,7 +146,7 @@ def mostrar_lista_gravedad(seleccion):
     nueva_ventana.title(f"Gravedad {seleccion}")
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
-    elementos=rojos(lista_pacientes)  # por si alguien apreta el boton antes de elegir
+    elementos = rojos(lista_pacientes)  # por si alguien apreta el boton antes de elegir
     if seleccion == "rojos":
         elementos = rojos(lista_pacientes)
         lista_gravedad.config(font=("Arial", 18), fg="red")
@@ -164,7 +169,7 @@ def mostrar_lista_gravedad(seleccion):
 
 def asignar_gravedad(pacientes):
 
-    for i in range(len(pacientes)):
+    for i in range(len(pacientes)-1, -1, -1):
 
         if pacientes[i]["sintomas"] == 'politraumatismo grave':
             pacientes[i]["gravedad"] = 5  # rojo
@@ -189,7 +194,8 @@ def cambiar_gravedad(pacientes):
     tiempo_actual = minutos_transcurridos()
 
     for i in range(len(pacientes)):
-        tiempo_transcurrido = pacientes[i]["tiempo_espera"]
+        tiempo_transcurrido = minutos_transcurridos() - pacientes[i]["tiempo_espera"]
+        # todo si el tiempo de espera es mayor a los minutos transcurridos?? si entra a las 23 q hacemos??
 
         if tiempo_transcurrido >= 120 and pacientes[i]["gravedad"] == 1:
             pacientes[i]["gravedad"] = 2
@@ -208,7 +214,9 @@ def cambiar_gravedad(pacientes):
             pacientes[i]["tiempo_espera"] = tiempo_actual
 
     return pacientes
-def Hospital(lista_pacientes):
+
+
+def hospital(lista_pacientes):
     lista_pacientes = cambiar_gravedad(lista_pacientes)
     lista_ordenada = dyc(lista_pacientes)
 
