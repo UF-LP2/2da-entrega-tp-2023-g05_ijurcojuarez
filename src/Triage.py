@@ -11,6 +11,8 @@ def atender_paciente(dni):
 
 
 def dyc(pacientes):
+    if len(pacientes)==0:
+        return pacientes
     if len(pacientes) == 1:   # caso base 1: hay un solo paciente
         return pacientes
 

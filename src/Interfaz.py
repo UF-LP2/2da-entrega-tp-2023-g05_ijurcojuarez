@@ -3,17 +3,21 @@ from datetime import datetime
 import tkinter as tk
 import csv
 
+
 with open("DATOS.csv", "r") as tabla:
     csv_reader = csv.DictReader(tabla)  # lee por columnas
     # Passing the cav_reader object to list() to get a list of lists
-    lista_pacientes = list(csv_reader)
+    personas = list(csv_reader)
 
-
+lista_pacientes = []
 INTERVALO_REFRESCO = 1000
 en_ejecucion = False
 hora_inicio = datetime.now()
 minutos_programa = 0
 activo = False
+nueva_ventana = None
+
+
 
 
 def iniciar_reloj():
@@ -21,7 +25,7 @@ def iniciar_reloj():
     hora_inicio = datetime.now()
     en_ejecucion = True
     refrescar_tiempo_transcurrido()
-    #asignar_gravedad(lista_pacientes)
+    asignar_gravedad(lista_pacientes)
     print(lista_pacientes)
     dyc(lista_pacientes)
 
@@ -62,7 +66,7 @@ def reiniciar_cronometro():
 
 
 def asignar_enfermeros():
-    enfermeros = 2
+    enfermeros=1
     if minutos_transcurridos() == 1380:  # minutos de 23 horas
         enfermeros = 1
 
@@ -75,23 +79,38 @@ def asignar_enfermeros():
     if minutos_transcurridos() == 960:  # minutos de 16 horas
         enfermeros = 3
 
-    for i in range(enfermeros):
-        asignar_gravedad(lista_pacientes[i])
+    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
+        llamar_pacientes(enfermeros)
 
+
+def llamar_pacientes(enfermeros):
+    enfermeria = []
+    for i in range(enfermeros):
+        enfermeria.append(personas[i])
+        #print(enfermeria)
+        del personas[i]
+        asignar_gravedad(enfermeria)
 
 def refrescar_tiempo_transcurrido():
     global activo
     if en_ejecucion:
         variable_hora_actual.set(obtener_tiempo_transcurrido_formateado())
-        minutos_pasados_label.config(text=f"Minutos transcurridos: {minutos_transcurridos()}")
+        # minutos_pasados_label.config(text=f"Minutos transcurridos: {minutos_transcurridos()}")
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
         asignar_enfermeros()
+        #mostrar_lista_gravedad()
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
-            Hospital(lista_pacientes)
+            hospital(lista_pacientes)
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() % 2 != 0:
             activo = False
+        if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5: # cada 5 mins atiende un paciente
+            atender_paciente()
+
+
+def atender_paciente():
+    del lista_pacientes[0]  # borra al paciente, se va del hospital
 
 
 def rojos(pacientes):
@@ -100,6 +119,7 @@ def rojos(pacientes):
         if pacientes[i]["gravedad"] == 5:
             lista_aux.append(pacientes[i]["nombre"])
     return lista_aux
+
 
 def naranjas(pacientes):
     lista_aux = []
@@ -132,7 +152,7 @@ def azules(pacientes):
             lista_aux.append(pacientes[i]["nombre"])
     return lista_aux
 
-    # todo:modificar para que elija la seleccion anterior si no seleccione una
+
 
 
 def mostrar_lista_gravedad(seleccion):
@@ -141,7 +161,8 @@ def mostrar_lista_gravedad(seleccion):
     nueva_ventana.title(f"Gravedad {seleccion}")
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
-    elementos=rojos(lista_pacientes)  # por si alguien apreta el boton antes de elegir
+
+    elementos = "rojos"
     if seleccion == "rojos":
         elementos = rojos(lista_pacientes)
         lista_gravedad.config(font=("Arial", 18), fg="red")
@@ -162,9 +183,10 @@ def mostrar_lista_gravedad(seleccion):
         lista_gravedad.insert(tk.END, elemento)
 
 
+
 def asignar_gravedad(pacientes):
 
-    for i in range(len(pacientes)):
+    for i in range(len(pacientes)-1, -1, -1):
 
         if pacientes[i]["sintomas"] == 'politraumatismo grave':
             pacientes[i]["gravedad"] = 5  # rojo
@@ -183,13 +205,15 @@ def asignar_gravedad(pacientes):
         else:
             del pacientes[i]  # elimina el paciente si tiene basura en el sintoma
         pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
+        lista_pacientes.append(pacientes[i])
+        print(lista_pacientes)
 
 
 def cambiar_gravedad(pacientes):
     tiempo_actual = minutos_transcurridos()
 
     for i in range(len(pacientes)):
-        tiempo_transcurrido = pacientes[i]["tiempo_espera"]
+        tiempo_transcurrido = minutos_transcurridos() - pacientes[i]["tiempo_espera"]
 
         if tiempo_transcurrido >= 120 and pacientes[i]["gravedad"] == 1:
             pacientes[i]["gravedad"] = 2
@@ -208,7 +232,9 @@ def cambiar_gravedad(pacientes):
             pacientes[i]["tiempo_espera"] = tiempo_actual
 
     return pacientes
-def Hospital(lista_pacientes):
+
+
+def hospital(lista_pacientes):
     lista_pacientes = cambiar_gravedad(lista_pacientes)
     lista_ordenada = dyc(lista_pacientes)
 
@@ -224,8 +250,8 @@ boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
 boton_detener.pack(side="left")  # Coloca el botón a la izquierda
 
-minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
-minutos_pasados_label.pack(side="left")
+#minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
+#minutos_pasados_label.pack(side="left")
 
 raiz.title("Menú Desplegable")
 
@@ -237,12 +263,10 @@ menu_gravedad = tk.OptionMenu(raiz, seleccion, *opciones)
 menu_gravedad.pack()
 
 boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca", command=lambda: mostrar_lista_gravedad(seleccion.get()))
-
 boton_mostrar_lista.pack()
-
 
 app = tk.Frame()
 raiz.title("reloj")
 
 app.pack()
-raiz.mainloop()
+
