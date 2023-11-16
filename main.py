@@ -1,8 +1,8 @@
 from src.Interfaz import raiz, iniciar_reloj
-import time
 
 
 def main() -> None:
+
     iniciar_reloj()
     raiz.mainloop()
 

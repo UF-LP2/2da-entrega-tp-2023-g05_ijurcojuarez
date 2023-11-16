@@ -3,7 +3,6 @@ from datetime import datetime
 import tkinter as tk
 import csv
 
-
 with open("DATOS.csv", "r") as tabla:
     csv_reader = csv.DictReader(tabla)  # lee por columnas
     # Passing the cav_reader object to list() to get a list of lists
@@ -15,10 +14,10 @@ en_ejecucion = False
 hora_inicio = datetime.now()
 minutos_programa = 0
 activo = False
-nueva_ventana = None
-#lista_gravedad = "SELECCIONE GRAVEDAD"
+#nueva_ventana = None
 
 
+# lista_gravedad = "SELECCIONE GRAVEDAD"
 
 
 def iniciar_reloj():
@@ -80,7 +79,8 @@ def asignar_enfermeros():
     if minutos_transcurridos() == 960:  # minutos de 16 horas
         enfermeros = 3
 
-    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5 and len(personas) != 0:  # cada 5 mins atiende un paciente
+    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5 and len(
+            personas) != 0:  # cada 5 mins atiende un paciente
         llamar_pacientes(enfermeros)
 
 
@@ -89,7 +89,7 @@ def llamar_pacientes(enfermeros):
     if len(personas) >= enfermeros:
         for i in range(enfermeros):
             enfermeria.append(personas[i])
-            #print(enfermeria)
+            # print(enfermeria)
             del personas[i]
             asignar_gravedad(enfermeria)
     else:
@@ -97,6 +97,7 @@ def llamar_pacientes(enfermeros):
             enfermeria.append(personas[i])
             del personas[i]
             asignar_gravedad(enfermeria)
+
 
 def refrescar_tiempo_transcurrido():
     global activo
@@ -106,7 +107,7 @@ def refrescar_tiempo_transcurrido():
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
         asignar_enfermeros()
-        #mostrar_lista_gravedad()
+        # mostrar_lista_gravedad()
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
             hospital(lista_pacientes)
@@ -120,71 +121,37 @@ def atender_paciente():
     del lista_pacientes[0]  # borra al paciente, se va del hospital
 
 
-def rojos(pacientes):
+def color(pacientes, gravedad):
     lista_aux = []
     for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 5:
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-
-
-def naranjas(pacientes):
-    lista_aux = []
-    for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 4:
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-
-
-def amarillos(pacientes):
-    lista_aux = []
-    for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 3:
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-
-
-def verdes(pacientes):
-    lista_aux = []
-    for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 2:
-            lista_aux.append(pacientes[i]["nombre"])
-    return lista_aux
-
-
-def azules(pacientes):
-    lista_aux = []
-    for i in range(len(pacientes)):
-        if pacientes[i]["gravedad"] == 1:
-            lista_aux.append(pacientes[i]["nombre"])  # TODO imprimir tambien esto pacientes[i]["apellido"]
+        if pacientes[i]["gravedad"] == gravedad:
+            lista_aux.append(pacientes[i]["apellido"] + "," + pacientes[i]["dni"])
     return lista_aux
 
 
 def mostrar_lista_gravedad(seleccion):
-    global nueva_ventana
-    if nueva_ventana == None:
-        nueva_ventana = tk.Toplevel(raiz)
-        nueva_ventana.title(f"Gravedad {seleccion}")
+    nueva_ventana = tk.Toplevel(raiz)
+    nueva_ventana.title(f"Gravedad {seleccion}")
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
 
     if seleccion == "elija gravedad":
-        elementos = "aaax"  # TODO solo imprime la ultima letra, q esta mal?
+        elementos = ["ELIJA GRAVEDAD!!!"]
         lista_gravedad.config(font=(")Arial", 18))
     elif seleccion == "rojos":
-        elementos = rojos(lista_pacientes)
+        elementos = color(lista_pacientes ,5)
         lista_gravedad.config(font=("Arial", 18), fg="red")
     elif seleccion == "verdes":
-        elementos = verdes(lista_pacientes)
+        elementos = color(lista_pacientes, 2)
         lista_gravedad.config(font=("Arial", 18), fg="green")
     elif seleccion == "azules":
-        elementos = azules(lista_pacientes)
+        elementos = color(lista_pacientes,1)
         lista_gravedad.config(font=("Arial", 18), fg="blue")
     elif seleccion == "amarillos":
-        elementos = amarillos(lista_pacientes)
+        elementos = color(lista_pacientes, 3)
         lista_gravedad.config(font=("Arial", 18), fg="yellow")
     elif seleccion == "naranjas":
-        elementos = naranjas(lista_pacientes)
+        elementos = color(lista_pacientes, 4)
         lista_gravedad.config(font=("Arial", 18), fg="orange")
 
     for elemento in elementos:
@@ -197,25 +164,29 @@ def mostrar_lista_gravedad(seleccion):
         global nueva_ventana
         if nueva_ventana == None:
             nueva_ventana = tk.Toplevel(raiz)
-    
+
         return
 """
 
 
 def asignar_gravedad(pacientes):
-
-    for i in range(len(pacientes)-1, -1, -1):
+    for i in range(len(pacientes) -1, -1, -1):
 
         if pacientes[i]["sintomas"] == 'politraumatismo grave':
             pacientes[i]["gravedad"] = 5  # rojo
 
-        elif pacientes[i]["sintomas"] == 'coma' or pacientes[i]["sintomas"] == 'convulsiones' or pacientes[i]["sintomas"] == 'hemorragia digestiva' or pacientes[i]["sintomas"] == 'isquemia':
+        elif pacientes[i]["sintomas"] == 'coma' or pacientes[i]["sintomas"] == 'convulsiones' or pacientes[i][
+            "sintomas"] == 'hemorragia digestiva' or pacientes[i]["sintomas"] == 'isquemia':
             pacientes[i]["gravedad"] = 4  # naranja
 
-        elif pacientes[i]["sintomas"] == 'cefalea brusca' or pacientes[i]["sintomas"] == 'paresia' or pacientes[i]["sintomas"] == 'hipertension arterial' or pacientes[i]["sintomas"] == 'vertigo con afectacion vegetativa' or pacientes[i]["sintomas"] == 'sincope' or pacientes[i]["sintomas"] == 'urgencias psiquiatricas':
+        elif pacientes[i]["sintomas"] == 'cefalea brusca' or pacientes[i]["sintomas"] == 'paresia' or pacientes[i][
+            "sintomas"] == 'hipertension arterial' or pacientes[i]["sintomas"] == 'vertigo con afectacion vegetativa' or \
+                pacientes[i]["sintomas"] == 'sincope' or pacientes[i]["sintomas"] == 'urgencias psiquiatricas':
             pacientes[i]["gravedad"] = 3  # amarilla
 
-        elif pacientes[i]["sintomas"] == 'otalgias' or pacientes[i]["sintomas"] == 'odontalgias' or pacientes[i]["sintomas"] == 'dolores inespecificos leves' or pacientes[i]["sintomas"] == 'traumatismos' or pacientes[i]["sintomas"] == 'esguinces':
+        elif pacientes[i]["sintomas"] == 'otalgias' or pacientes[i]["sintomas"] == 'odontalgias' or pacientes[i][
+            "sintomas"] == 'dolores inespecificos leves' or pacientes[i]["sintomas"] == 'traumatismos' or pacientes[i][
+            "sintomas"] == 'esguinces':
             pacientes[i]["gravedad"] = 2  # verde
 
         elif pacientes[i]["sintomas"] == 'cefalea' or pacientes[i]["sintomas"] == 'tos':
@@ -268,8 +239,8 @@ boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
 boton_detener.pack(side="left")  # Coloca el botón a la izquierda
 
-#minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
-#minutos_pasados_label.pack(side="left")
+# minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
+# minutos_pasados_label.pack(side="left")
 
 raiz.title("Menú Desplegable")
 
@@ -280,11 +251,11 @@ seleccion.set(opciones[0])  # Valor predeterminado
 menu_gravedad = tk.OptionMenu(raiz, seleccion, *opciones)
 menu_gravedad.pack()
 
-boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca", command=lambda: mostrar_lista_gravedad(seleccion.get()))
+boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca",
+                                command=lambda: mostrar_lista_gravedad(seleccion.get()))
 boton_mostrar_lista.pack()
 
 app = tk.Frame()
 raiz.title("reloj")
 
 app.pack()
-

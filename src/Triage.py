@@ -1,13 +1,6 @@
-import csv
-
 enfermeros: int
 pacientes = []
 medicos: int    # infinitos
-
-
-def atender_paciente(dni):
-    pos = pacientes.index(dni)  # index busca la posicion en la lista
-    del pacientes[pos]   # borra al paciente, se va del hospital
 
 
 def dyc(pacientes):

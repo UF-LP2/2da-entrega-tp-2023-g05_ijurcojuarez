@@ -23,10 +23,10 @@ class MyTestCase(unittest.TestCase):
     def test_basura(self):
         pacientes = [{"sintomas": 'asdsd', "gravedad": 0, "tiempo_espera": 0}, {"sintomas": 'politraumatismo grave', "gravedad": 0, "tiempo_espera": 0}]
         longitud_inicial = len(pacientes)# la longitud inicial de la lista de pacientes
-        asignar_gravedad(pacientes) # Llama a la función que borra el paciente si tiene basura en el sintoma
-        longitud_despues = len(pacientes) # la longitud después de la llamada a la función
+        asignar_gravedad(pacientes)  # Llama a la función que borra el paciente si tiene basura en el sintoma
+        longitud_despues = len(pacientes)  # la longitud después de la llamada a la función
         assert longitud_despues < longitud_inicial
 
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     unittest.main()
