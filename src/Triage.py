@@ -11,12 +11,10 @@ def atender_paciente(dni):
 
 
 def dyc(pacientes):
-    if len(pacientes)==0:
-        return pacientes
-    if len(pacientes) == 1:   # caso base 1: hay un solo paciente
+    if len(pacientes) == 0 or len(pacientes) == 1:  # caso base 1: esta vacia la lista o hay un solo paciente
         return pacientes
 
-    if len(pacientes) == 2:   # caso base 2: hay dos pacientes. ordenamos y retornamos la lista ordenada
+    if len(pacientes) == 2:   # caso base 2: hay dos pacientes, ordenamos y retornamos la lista ordenada
         if pacientes[0]["gravedad"] > pacientes[1]["gravedad"]:
           return pacientes
         else:

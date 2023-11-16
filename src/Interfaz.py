@@ -16,6 +16,7 @@ hora_inicio = datetime.now()
 minutos_programa = 0
 activo = False
 nueva_ventana = None
+#lista_gravedad = "SELECCIONE GRAVEDAD"
 
 
 
@@ -66,7 +67,7 @@ def reiniciar_cronometro():
 
 
 def asignar_enfermeros():
-    enfermeros=1
+    enfermeros = 2
     if minutos_transcurridos() == 1380:  # minutos de 23 horas
         enfermeros = 1
 
@@ -79,17 +80,23 @@ def asignar_enfermeros():
     if minutos_transcurridos() == 960:  # minutos de 16 horas
         enfermeros = 3
 
-    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
+    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5 and len(personas) != 0:  # cada 5 mins atiende un paciente
         llamar_pacientes(enfermeros)
 
 
 def llamar_pacientes(enfermeros):
     enfermeria = []
-    for i in range(enfermeros):
-        enfermeria.append(personas[i])
-        #print(enfermeria)
-        del personas[i]
-        asignar_gravedad(enfermeria)
+    if len(personas) >= enfermeros:
+        for i in range(enfermeros):
+            enfermeria.append(personas[i])
+            #print(enfermeria)
+            del personas[i]
+            asignar_gravedad(enfermeria)
+    else:
+        for i in range(len(personas)):
+            enfermeria.append(personas[i])
+            del personas[i]
+            asignar_gravedad(enfermeria)
 
 def refrescar_tiempo_transcurrido():
     global activo
@@ -105,7 +112,7 @@ def refrescar_tiempo_transcurrido():
             hospital(lista_pacientes)
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() % 2 != 0:
             activo = False
-        if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5: # cada 5 mins atiende un paciente
+        if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
             atender_paciente()
 
 
@@ -149,21 +156,22 @@ def azules(pacientes):
     lista_aux = []
     for i in range(len(pacientes)):
         if pacientes[i]["gravedad"] == 1:
-            lista_aux.append(pacientes[i]["nombre"])
+            lista_aux.append(pacientes[i]["nombre"])  # TODO imprimir tambien esto pacientes[i]["apellido"]
     return lista_aux
 
 
-
-
 def mostrar_lista_gravedad(seleccion):
-
-    nueva_ventana = tk.Toplevel(raiz)
-    nueva_ventana.title(f"Gravedad {seleccion}")
+    global nueva_ventana
+    if nueva_ventana == None:
+        nueva_ventana = tk.Toplevel(raiz)
+        nueva_ventana.title(f"Gravedad {seleccion}")
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
 
-    elementos = "rojos"
-    if seleccion == "rojos":
+    if seleccion == "elija gravedad":
+        elementos = "aaax"  # TODO solo imprime la ultima letra, q esta mal?
+        lista_gravedad.config(font=(")Arial", 18))
+    elif seleccion == "rojos":
         elementos = rojos(lista_pacientes)
         lista_gravedad.config(font=("Arial", 18), fg="red")
     elif seleccion == "verdes":
@@ -180,8 +188,18 @@ def mostrar_lista_gravedad(seleccion):
         lista_gravedad.config(font=("Arial", 18), fg="orange")
 
     for elemento in elementos:
+        lista_gravedad.delete(0, tk.END)  # borra lo q hay en la lista
         lista_gravedad.insert(tk.END, elemento)
 
+
+"""
+    def crear_ventana():
+        global nueva_ventana
+        if nueva_ventana == None:
+            nueva_ventana = tk.Toplevel(raiz)
+    
+        return
+"""
 
 
 def asignar_gravedad(pacientes):
@@ -213,7 +231,7 @@ def cambiar_gravedad(pacientes):
     tiempo_actual = minutos_transcurridos()
 
     for i in range(len(pacientes)):
-        tiempo_transcurrido = minutos_transcurridos() - pacientes[i]["tiempo_espera"]
+        tiempo_transcurrido = tiempo_actual - pacientes[i]["tiempo_espera"]
 
         if tiempo_transcurrido >= 120 and pacientes[i]["gravedad"] == 1:
             pacientes[i]["gravedad"] = 2
@@ -236,7 +254,7 @@ def cambiar_gravedad(pacientes):
 
 def hospital(lista_pacientes):
     lista_pacientes = cambiar_gravedad(lista_pacientes)
-    lista_ordenada = dyc(lista_pacientes)
+    lista_pacientes = dyc(lista_pacientes)
 
 
 raiz = tk.Tk()
@@ -244,7 +262,7 @@ variable_hora_actual = tk.StringVar(raiz, value="00:00:00")
 raiz.etiqueta = tk.Label(raiz, textvariable=variable_hora_actual, font="Consolas 60")
 raiz.etiqueta.pack()
 
-boton_iniciar = tk.Button(raiz, text="Iniciar Tiempo", command=iniciar_reloj, bg="green", fg="white")
+boton_iniciar = tk.Button(raiz, text="Reiniciar Tiempo", command=iniciar_reloj, bg="green", fg="white")
 boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 
 boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
