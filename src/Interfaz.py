@@ -14,7 +14,8 @@ en_ejecucion = False
 hora_inicio = datetime.now()
 minutos_programa = 0
 activo = False
-#nueva_ventana = None
+nueva_ventana =  None
+
 
 
 # lista_gravedad = "SELECCIONE GRAVEDAD"
@@ -107,7 +108,8 @@ def refrescar_tiempo_transcurrido():
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
         asignar_enfermeros()
-        # mostrar_lista_gravedad()
+
+
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
             hospital(lista_pacientes)
@@ -115,6 +117,7 @@ def refrescar_tiempo_transcurrido():
             activo = False
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
             atender_paciente()
+            crear_ventana()
 
 
 def atender_paciente():
@@ -130,8 +133,10 @@ def color(pacientes, gravedad):
 
 
 def mostrar_lista_gravedad(seleccion):
+    global nueva_ventana
     nueva_ventana = tk.Toplevel(raiz)
     nueva_ventana.title(f"Gravedad {seleccion}")
+    nueva_ventana.geometry("+%d+%d" % (100, 300))  # posicion de la ventana
     lista_gravedad = tk.Listbox(nueva_ventana)
     lista_gravedad.pack()
 
@@ -159,14 +164,15 @@ def mostrar_lista_gravedad(seleccion):
         lista_gravedad.insert(tk.END, elemento)
 
 
-"""
-    def crear_ventana():
-        global nueva_ventana
-        if nueva_ventana == None:
-            nueva_ventana = tk.Toplevel(raiz)
 
-        return
-"""
+def crear_ventana():
+    global nueva_ventana
+    if nueva_ventana != None:
+        nueva_ventana.destroy()
+    mostrar_lista_gravedad(seleccion.get())
+
+    return
+
 
 
 def asignar_gravedad(pacientes):
@@ -228,6 +234,7 @@ def hospital(lista_pacientes):
     lista_pacientes = dyc(lista_pacientes)
 
 
+
 raiz = tk.Tk()
 variable_hora_actual = tk.StringVar(raiz, value="00:00:00")
 raiz.etiqueta = tk.Label(raiz, textvariable=variable_hora_actual, font="Consolas 60")
@@ -251,8 +258,7 @@ seleccion.set(opciones[0])  # Valor predeterminado
 menu_gravedad = tk.OptionMenu(raiz, seleccion, *opciones)
 menu_gravedad.pack()
 
-boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca",
-                                command=lambda: mostrar_lista_gravedad(seleccion.get()))
+boton_mostrar_lista = tk.Button(raiz, text="despues de elegir gravedad, haga click aca", command=lambda: crear_ventana())
 boton_mostrar_lista.pack()
 
 app = tk.Frame()
