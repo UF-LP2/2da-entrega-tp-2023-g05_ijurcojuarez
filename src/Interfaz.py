@@ -17,17 +17,13 @@ activo = False
 nueva_ventana =  None
 
 
-
-# lista_gravedad = "SELECCIONE GRAVEDAD"
-
-
+# cronometro
 def iniciar_reloj():
     global hora_inicio, en_ejecucion
     hora_inicio = datetime.now()
     en_ejecucion = True
     refrescar_tiempo_transcurrido()
     asignar_gravedad(lista_pacientes)
-    print(lista_pacientes)
     dyc(lista_pacientes)
 
 
@@ -36,13 +32,11 @@ def detener_reloj():
     en_ejecucion = False
 
 
-def retomar_reloj():
-    global en_ejecucion
-    en_ejecucion = True
-    hora_inicio = minutos_transcurridos()
-    refrescar_tiempo_transcurrido() #todo quiero q refresque solo cuando apreto !! (ver)
-
-
+def reiniciar_cronometro():
+    if minutos_transcurridos() == 1439:
+        global hora_inicio, en_ejecucion
+        hora_inicio = datetime.now()
+        en_ejecucion = True
 
 
 def minutos_transcurridos():
@@ -68,47 +62,6 @@ def obtener_tiempo_transcurrido_formateado():
     return segundos_a_segundos_minutos_y_horas(int(horas_programa * 60 * 60))
 
 
-def reiniciar_cronometro():
-    if minutos_transcurridos() == 1439:
-        global hora_inicio, en_ejecucion
-        hora_inicio = datetime.now()
-        en_ejecucion = True
-
-
-def asignar_enfermeros():
-    enfermeros = 2
-    if minutos_transcurridos() == 1380:  # minutos de 23 horas
-        enfermeros = 1
-
-    if minutos_transcurridos() == 360:  # minutos de 6 horas
-        enfermeros = 2
-
-    if minutos_transcurridos() == 600:  # minutos de 10 horas
-        enfermeros = 5
-
-    if minutos_transcurridos() == 960:  # minutos de 16 horas
-        enfermeros = 3
-
-    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5 and len(
-            personas) != 0:  # cada 5 mins atiende un paciente
-        llamar_pacientes(enfermeros)
-
-
-def llamar_pacientes(enfermeros):
-    enfermeria = []
-    if len(personas) >= enfermeros:
-        for i in range(enfermeros):
-            enfermeria.append(personas[i])
-            # print(enfermeria)
-            del personas[i]
-            asignar_gravedad(enfermeria)
-    else:
-        for i in range(len(personas)):
-            enfermeria.append(personas[i])
-            del personas[i]
-            asignar_gravedad(enfermeria)
-
-
 def refrescar_tiempo_transcurrido():
     global activo
     if en_ejecucion:
@@ -117,8 +70,6 @@ def refrescar_tiempo_transcurrido():
         raiz.after(INTERVALO_REFRESCO, refrescar_tiempo_transcurrido)
         reiniciar_cronometro()
         asignar_enfermeros()
-
-
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
             crear_ventana()
@@ -127,11 +78,6 @@ def refrescar_tiempo_transcurrido():
             activo = False
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
             atender_paciente()
-
-
-
-def atender_paciente():
-    del lista_pacientes[0]  # borra al paciente, se va del hospital
 
 
 def color(pacientes, gravedad):
@@ -174,15 +120,46 @@ def mostrar_lista_gravedad(seleccion):
         lista_gravedad.insert(tk.END, elemento)
 
 
-
 def crear_ventana():
     global nueva_ventana
     if nueva_ventana != None:
         nueva_ventana.destroy()
     mostrar_lista_gravedad(seleccion.get())
-
     return
 
+
+# parte del programa en si fuera del cronomentro
+def asignar_enfermeros():
+    enfermeros = 2
+    if minutos_transcurridos() == 1380:  # minutos de 23 horas
+        enfermeros = 1
+
+    if minutos_transcurridos() == 360:  # minutos de 6 horas
+        enfermeros = 2
+
+    if minutos_transcurridos() == 600:  # minutos de 10 horas
+        enfermeros = 5
+
+    if minutos_transcurridos() == 960:  # minutos de 16 horas
+        enfermeros = 3
+
+    if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5 and len(personas) != 0:  # cada 5 mins atiende un paciente
+        llamar_pacientes(enfermeros)
+
+
+def llamar_pacientes(enfermeros):
+    enfermeria = []
+    if len(personas) >= enfermeros:
+        for i in range(enfermeros):
+            enfermeria.append(personas[i])
+            # print(enfermeria)
+            del personas[i]
+            asignar_gravedad(enfermeria)
+    else:
+        for i in range(len(personas)):
+            enfermeria.append(personas[i])
+            del personas[i]
+            asignar_gravedad(enfermeria)
 
 
 def asignar_gravedad(pacientes):
@@ -212,6 +189,10 @@ def asignar_gravedad(pacientes):
         pacientes[i]["tiempo_espera"] = minutos_transcurridos()  # asigno el tiempo en el cual fue revisado
         lista_pacientes.append(pacientes[i])
         print(lista_pacientes)
+
+
+def atender_paciente():
+    del lista_pacientes[0]  # borra al paciente, se va del hospital
 
 
 def cambiar_gravedad(pacientes):
@@ -256,8 +237,6 @@ boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
 boton_detener.pack(side="left")  # Coloca el botón a la izquierda
 
-boton_retomar = tk.Button(raiz, text="Continuar Tiempo", command=retomar_reloj, bg="yellow", fg="black")
-boton_retomar.pack(side="left")  # Coloca el botón a la izquierda
 
 # minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
 # minutos_pasados_label.pack(side="left")
