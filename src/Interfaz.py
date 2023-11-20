@@ -36,6 +36,15 @@ def detener_reloj():
     en_ejecucion = False
 
 
+def retomar_reloj():
+    global en_ejecucion
+    en_ejecucion = True
+    hora_inicio = minutos_transcurridos()
+    refrescar_tiempo_transcurrido() #todo quiero q refresque solo cuando apreto !! (ver)
+
+
+
+
 def minutos_transcurridos():
     segundos_transcurridos = (datetime.now() - hora_inicio).total_seconds()
     minutos_programa = int(segundos_transcurridos)
@@ -112,12 +121,13 @@ def refrescar_tiempo_transcurrido():
 
         if minutos_transcurridos() >= 10 and minutos_transcurridos() % 10 == 0 and activo == False:
             activo = True
+            crear_ventana()
             hospital(lista_pacientes)
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() % 2 != 0:
             activo = False
         if minutos_transcurridos() % 5 == 0 and minutos_transcurridos() >= 5:  # cada 5 mins atiende un paciente
             atender_paciente()
-            crear_ventana()
+
 
 
 def atender_paciente():
@@ -128,7 +138,7 @@ def color(pacientes, gravedad):
     lista_aux = []
     for i in range(len(pacientes)):
         if pacientes[i]["gravedad"] == gravedad:
-            lista_aux.append(pacientes[i]["apellido"] + "," + pacientes[i]["dni"])
+            lista_aux.append( pacientes[i]["apellido"] + pacientes[i]["dni"])
     return lista_aux
 
 
@@ -245,6 +255,9 @@ boton_iniciar.pack(side="left")  # Coloca el botón a la izquierda
 
 boton_detener = tk.Button(raiz, text="Detener Tiempo", command=detener_reloj, bg="red", fg="black")
 boton_detener.pack(side="left")  # Coloca el botón a la izquierda
+
+boton_retomar = tk.Button(raiz, text="Continuar Tiempo", command=retomar_reloj, bg="yellow", fg="black")
+boton_retomar.pack(side="left")  # Coloca el botón a la izquierda
 
 # minutos_pasados_label = tk.Label(raiz, text="Minutos transcurridos: 0")
 # minutos_pasados_label.pack(side="left")
