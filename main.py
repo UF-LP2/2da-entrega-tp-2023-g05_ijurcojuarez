@@ -1,5 +1,11 @@
+from src.Interfaz import raiz, iniciar_reloj
+
+
 def main() -> None:
-  print("Hello World")
+
+    iniciar_reloj()
+    raiz.mainloop()
+
 
 if __name__ == "__main__":
-  main()
+    main()
